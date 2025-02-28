@@ -1,4 +1,4 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, InputType, Int } from '@nestjs/graphql';
 
 @InputType()
 export class CreateUserDto {
@@ -11,7 +11,7 @@ export class CreateUserDto {
     @Field()
     password: string;
 
-    @Field()
+    @Field((type) => Int , {nullable: true})
     mobileNo: number;
 }
 

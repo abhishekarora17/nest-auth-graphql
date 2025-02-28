@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { User } from './database/user.entity';
 import { CreateUserDto } from './dto/user.dto';
 import * as bcrypt from 'bcrypt';
+import { Message } from './entities/message.entity';
 
 @Injectable()
 export class UserService {
@@ -12,7 +13,7 @@ export class UserService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async createUser(createUserDto: CreateUserDto): Promise<User> {
+  async createUser(createUserDto: CreateUserDto): Promise<Message> {
     const { name, email, password, mobileNo } = createUserDto;
 
     // Hash the password with a salt
@@ -26,6 +27,12 @@ export class UserService {
       mobileNo
     });
 
-    return this.userRepository.save(user);
+    await this.userRepository.save(user);
+
+    let message = new Message();
+    message.success = true;
+    message.message = 'User created successfully';
+
+    return message;
   }
 }

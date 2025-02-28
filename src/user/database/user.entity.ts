@@ -8,7 +8,6 @@ export class User {
   id: number;
 
   @Column({
-    unique: true,
     type: 'varchar',
     length: 100,
   })
@@ -33,13 +32,13 @@ export class User {
 
   @Column({
     type: 'timestamp',
-    default: null,
+    default: () => "CURRENT_TIMESTAMP",
   })
   created_at: Date;
 
   @Column({
     type: 'timestamp',
-    default: null,
+    default: () => "CURRENT_TIMESTAMP",
   })
   updated_at: Date;
 
