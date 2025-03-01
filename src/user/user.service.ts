@@ -20,34 +20,35 @@ export class UserService {
     const { name, email, password, mobileNo } = createUserDto;
 
     let userExists = await this.userRepository.findOne({where: { email }});
-
     if(userExists){
       let response = new UserEntity();
       response.message = 'User already exists';
       response.success = false;
-      return response
+      return response;
     }
   
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = this.userRepository.create({
-      name,
-      email,
-      password: hashedPassword,
-      mobileNo
+        name,
+        email,
+        password: hashedPassword,
+        mobileNo
     });
 
-    // save user after creating will provide an instance of user
+    // Save user after creating
     await this.userRepository.save(user);
-  
-    const tokens = await this.generateTokens(user.id, user.email);
-    user.accessToken  = tokens.accessToken;
-    user.refreshToken = await this.updateRefreshToken(user.id, tokens.refreshToken);
 
-    let response     = new UserEntity();
-    response.message = 'User already exists';
-    response.success = false;
-    response.data    = user;
-    return response;
+    const tokens = await this.generateTokens(user.id, user.email);
+    const hashedToken = await this.updateRefreshToken(user.id, tokens);
+
+    return {
+      message: 'User created successfully',
+      success: true,
+      data: Object.assign(new UserEntity(), user, { 
+                accessToken: tokens.accessToken, 
+                refreshToken: hashedToken.hashedRt 
+            })
+    };
   }
 
   async login(loginDto: LoginDto): Promise<UserEntity> {
@@ -73,23 +74,24 @@ export class UserService {
     };
   }
 
-  private async generateTokens(userId: number, email: string) {
+  async generateTokens(userId: number, email: string) {
     const accessToken = this.jwtService.sign(
-      { id: userId, email },
+      { sub: userId, email }, // Use 'sub' instead of 'id'
       { secret: process.env.JWT_SECRET, expiresIn: '15m' }
     );
 
     const refreshToken = this.jwtService.sign(
-      { id: userId, email },
+      { sub: userId, email },
       { secret: process.env.JWT_REFRESH_SECRET, expiresIn: '7d' }
     );
 
     return { accessToken, refreshToken };
-  }
+}
 
-  private async updateRefreshToken(userId: number, refreshToken: string): Promise<string> {
-    const hashedToken = await bcrypt.hash(refreshToken, 10);
-    await this.userRepository.update(userId, { refreshToken: hashedToken });
-    return hashedToken;
-  }
+  private async updateRefreshToken(userId: number, tokens: { accessToken: string; refreshToken: string }): Promise<{ hashedRt: string; hashedAt: string }> {
+    const hashedRt = await bcrypt.hash(tokens.refreshToken, 10);
+    const hashedAt = await bcrypt.hash(tokens.accessToken, 10);
+    await this.userRepository.update(userId, { refreshToken: hashedRt, accessToken: hashedAt });
+    return { hashedRt, hashedAt };
+}
 }
