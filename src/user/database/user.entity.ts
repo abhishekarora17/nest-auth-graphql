@@ -35,6 +35,12 @@ export class User {
   refreshToken?: string;
 
   @Column({
+     nullable: true,
+     type: 'varchar', 
+  })
+  accessToken?: string;
+
+  @Column({
     type: 'timestamp',
     default: () => "CURRENT_TIMESTAMP",
   })

@@ -36,27 +36,30 @@ export class UserService {
       mobileNo
     });
 
+    // save user after creating will provide an instance of user
     await this.userRepository.save(user);
   
     const tokens = await this.generateTokens(user.id, user.email);
+    user.accessToken  = tokens.accessToken;
     user.refreshToken = await this.updateRefreshToken(user.id, tokens.refreshToken);
 
-    let response = new UserEntity();
+    let response     = new UserEntity();
     response.message = 'User already exists';
     response.success = false;
-    response.data = user;
+    response.data    = user;
     return response;
   }
 
   async login(loginDto: LoginDto): Promise<UserEntity> {
     const { email, password } = loginDto;
 
+    // user credentials exists or not
     const user = await this.userRepository.findOne({ where: { email } });
-
     if (!user) {
       throw new UnauthorizedException("Invalid credentials.");
     }
 
+    // checking password is same or not
     const isValidPwd = await bcrypt.compare(password, user.password);
     if (!isValidPwd) {
       throw new UnauthorizedException("Invalid credentials.");

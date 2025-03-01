@@ -3,6 +3,10 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UserService } from './user.service';
 import { UserEntity } from './entities/user-entity.entity';
 import { LoginDto } from './dto/login.dto';
+import { CurrentUser } from 'src/auth/decorator/current-user.decorator';
+import { UserType } from './entities/current-user.entity';
+import { UseGuards } from '@nestjs/common';
+import { Auth } from 'src/auth/guards/jwt-auth.guard';
 
 @Resolver()
 export class UserResolver {
@@ -11,6 +15,12 @@ export class UserResolver {
   @Query(() => String) 
   async hello() {
     return 'hello';
+  }
+
+  @Query(() => UserType)
+  @UseGuards(Auth)
+  async getProfile(@CurrentUser() user:UserType) {
+      return user;
   }
 
   @Mutation(() => UserEntity)
