@@ -29,7 +29,6 @@ export class UserService {
     }
   
     const hashedPassword = await bcrypt.hash(password, 10);
-  
     const user = this.userRepository.create({
       name,
       email,
@@ -40,7 +39,6 @@ export class UserService {
     await this.userRepository.save(user);
   
     const tokens = await this.generateTokens(user.id, user.email);
-
     user.refreshToken = await this.updateRefreshToken(user.id, tokens.refreshToken);
 
     let response = new UserEntity();
@@ -56,20 +54,19 @@ export class UserService {
     const user = await this.userRepository.findOne({ where: { email } });
 
     if (!user) {
-        throw new UnauthorizedException("Invalid credentials");
+      throw new UnauthorizedException("Invalid credentials.");
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-        throw new UnauthorizedException("Invalid credentials");
+    const isValidPwd = await bcrypt.compare(password, user.password);
+    if (!isValidPwd) {
+      throw new UnauthorizedException("Invalid credentials.");
     }
 
     const token = this.jwtService.sign({ id: user.id, email: user.email });
-
     return {
-        success: true,
-        message: "Login successful",
-        data: Object.assign(new User(), user, { accessToken: token }),
+      success: true,
+      message: "Login successful",
+      data: Object.assign(new User(), user, { accessToken: token }),
     };
   }
 
