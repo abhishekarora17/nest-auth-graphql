@@ -7,12 +7,13 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { UserModule } from './user/user.module';
 import { User } from './user/database/user.entity';
 import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true, // makes environment variables available globally
-      envFilePath: '.env', // ensure your .env file is in the root of your project
+      envFilePath: '.env',
     }),
     TypeOrmModule.forRoot({
       type: 'mysql',
@@ -33,7 +34,8 @@ import { ConfigModule } from '@nestjs/config';
       // typePaths: ['./**/*.graphql'],
       introspection: true,
     }),
-    UserModule
+    UserModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,8 +1,6 @@
-import { ObjectType } from '@nestjs/graphql';
 import { Entity, Column, PrimaryGeneratedColumn, DeleteDateColumn } from 'typeorm';
 
 @Entity()
-@ObjectType()
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -29,6 +27,12 @@ export class User {
     default: null,
   })
   mobileNo: number;
+
+  @Column({
+     nullable: true,
+     type: 'varchar', 
+  })
+  refreshToken?: string;
 
   @Column({
     type: 'timestamp',
