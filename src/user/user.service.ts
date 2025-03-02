@@ -39,14 +39,14 @@ export class UserService {
     await this.userRepository.save(user);
 
     const tokens = await this.generateTokens(user.id, user.email);
-    const hashedToken = await this.updateRefreshToken(user.id, tokens);
+    const hashedRt = await this.updateRefreshToken(user.id, tokens);
 
     return {
       message: 'User created successfully',
       success: true,
       data: Object.assign(new UserEntity(), user, { 
                 accessToken: tokens.accessToken, 
-                refreshToken: hashedToken.hashedRt 
+                refreshToken: hashedRt 
             })
     };
   }
@@ -76,22 +76,22 @@ export class UserService {
 
   async generateTokens(userId: number, email: string) {
     const accessToken = this.jwtService.sign(
-      { sub: userId, email }, // Use 'sub' instead of 'id'
+      { id: userId, email },
       { secret: process.env.JWT_SECRET, expiresIn: '15m' }
     );
 
     const refreshToken = this.jwtService.sign(
-      { sub: userId, email },
+      { id: userId, email },
       { secret: process.env.JWT_REFRESH_SECRET, expiresIn: '7d' }
     );
 
     return { accessToken, refreshToken };
-}
+  }
 
-  private async updateRefreshToken(userId: number, tokens: { accessToken: string; refreshToken: string }): Promise<{ hashedRt: string; hashedAt: string }> {
+  private async updateRefreshToken(userId: number, tokens: { accessToken: string; refreshToken: string }): Promise<string> {
     const hashedRt = await bcrypt.hash(tokens.refreshToken, 10);
     const hashedAt = await bcrypt.hash(tokens.accessToken, 10);
     await this.userRepository.update(userId, { refreshToken: hashedRt, accessToken: hashedAt });
-    return { hashedRt, hashedAt };
-}
+    return hashedRt;
+  }
 }
