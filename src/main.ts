@@ -8,6 +8,6 @@ async function bootstrap() {
         // .catch((error) => console.error("Database Connection Error:", error));
 
   const app = await NestFactory.create(AppModule);
-  await app.listen(process.env.PORT ?? 3010);
+  await app.listen(process.env.PORT ?? 3012);
 }
 bootstrap();

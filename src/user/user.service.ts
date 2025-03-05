@@ -39,14 +39,15 @@ export class UserService {
     await this.userRepository.save(user);
 
     const tokens = await this.generateTokens(user.id, user.email);
-    const hashedRt = await this.updateRefreshToken(user.id, tokens);
+    //update tokens in table after creating
+    await this.updateRefreshToken(user.id, tokens);
 
     return {
       message: 'User created successfully',
       success: true,
       data: Object.assign(new UserEntity(), user, { 
                 accessToken: tokens.accessToken, 
-                refreshToken: hashedRt 
+                refreshToken: tokens.refreshToken 
             })
     };
   }
@@ -88,10 +89,7 @@ export class UserService {
     return { accessToken, refreshToken };
   }
 
-  private async updateRefreshToken(userId: number, tokens: { accessToken: string; refreshToken: string }): Promise<string> {
-    const hashedRt = await bcrypt.hash(tokens.refreshToken, 10);
-    const hashedAt = await bcrypt.hash(tokens.accessToken, 10);
-    await this.userRepository.update(userId, { refreshToken: hashedRt, accessToken: hashedAt });
-    return hashedRt;
+  private async updateRefreshToken(userId: number, tokens: { accessToken: string; refreshToken: string }){
+    await this.userRepository.update(userId, { refreshToken: tokens.refreshToken, accessToken: tokens.accessToken });
   }
 }
