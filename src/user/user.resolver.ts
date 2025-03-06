@@ -7,6 +7,7 @@ import { CurrentUser } from 'src/auth/decorator/current-user.decorator';
 import { UserType } from './entities/current-user.entity';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { Auth } from 'src/auth/decorator/auth.decorator';
 
 @Resolver()
 export class UserResolver {
@@ -18,7 +19,7 @@ export class UserResolver {
   }
 
   @Query(() => UserType)
-  @UseGuards(JwtAuthGuard)
+  @Auth()
   async getProfile(@CurrentUser() user:UserType) {
       return user;
   }
