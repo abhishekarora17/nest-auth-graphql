@@ -6,8 +6,8 @@ import { User } from 'src/user/database/user.entity';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { UserEntity } from 'src/user/entities/user-entity.entity';
-import { LoginDto } from 'src/user/dto/login.dto';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { LoginDto } from './dto/login.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -23,10 +23,7 @@ export class AuthService {
 
     let userExists = await this.userRepository.findOne({where: { email }});
     if(userExists){
-      let response = new UserEntity();
-      response.message = 'User already exists';
-      response.success = false;
-      return response;
+      throw new UnauthorizedException('User already exists');
     }
   
     const hashedPassword = await bcrypt.hash(password, 10);

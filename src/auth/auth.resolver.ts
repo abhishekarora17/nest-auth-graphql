@@ -3,9 +3,8 @@ import { AuthService } from './auth.service';
 import { CreateRefreshTokenDto } from './dto/create-refresh-token';
 import { Token } from './entities/token.entity';
 import { UserEntity } from 'src/user/entities/user-entity.entity';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
-import { LoginDto } from 'src/user/dto/login.dto';
-
+import { CreateUserDto } from './dto/create-user.dto';
+import { LoginDto } from './dto/login.dto';
 @Resolver()
 export class AuthResolver {
   constructor(
