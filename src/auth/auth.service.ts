@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Token } from './entities/token.entity';
-import { CreateRefreshTokenDto } from './dto/create-refresh-token';
+import { CreateRefreshTokenDto } from './dto/create-refresh-token.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/database/user.entity';
 import { Repository } from 'typeorm';

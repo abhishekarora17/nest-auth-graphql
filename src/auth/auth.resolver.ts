@@ -1,6 +1,6 @@
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
-import { CreateRefreshTokenDto } from './dto/create-refresh-token';
+import { CreateRefreshTokenDto } from './dto/create-refresh-token.dto';
 import { Token } from './entities/token.entity';
 import { UserEntity } from 'src/user/entities/user-entity.entity';
 import { CreateUserDto } from './dto/create-user.dto';
