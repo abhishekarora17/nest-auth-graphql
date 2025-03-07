@@ -8,6 +8,8 @@ import { UserModule } from './user/user.module';
 import { User } from './user/database/user.entity';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
+import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
+import * as path from 'path';
 
 @Module({
   imports: [
@@ -33,6 +35,17 @@ import { AuthModule } from './auth/auth.module';
       csrfPrevention: false,
       // typePaths: ['./**/*.graphql'],
       introspection: true,
+    }),
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      loaderOptions: {
+        path: path.join(process.cwd(), 'src/i18n/'),
+        watch: true,
+      },    
+      resolvers: [
+        { use: QueryResolver, options: ['lang'] },
+        AcceptLanguageResolver
+      ],
     }),
     UserModule,
     AuthModule

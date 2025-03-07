@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Token } from './entities/token.entity';
 import { CreateRefreshTokenDto } from './dto/create-refresh-token';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,13 +9,15 @@ import { UserEntity } from 'src/user/entities/user-entity.entity';
 import { LoginDto } from './dto/login.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
+import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class AuthService {
  constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
+    private readonly i18nService: I18nService,
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<UserEntity> {
@@ -23,7 +25,7 @@ export class AuthService {
 
     let userExists = await this.userRepository.findOne({where: { email }});
     if(userExists){
-      throw new UnauthorizedException('User already exists');
+      throw new BadRequestException(this.i18nService.translate('user.USER_ALREADY_EXISTS'));
     }
   
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -42,7 +44,7 @@ export class AuthService {
     await this.updateRefreshToken(user.id, tokens);
 
     return {
-      message: 'User created successfully',
+      message: this.i18nService.translate('user.USER_CREATED'),
       success: true,
       data: Object.assign(new UserEntity(), user, { 
                 accessToken: tokens.accessToken, 
@@ -57,13 +59,13 @@ export class AuthService {
     // user credentials exists or not
     const user = await this.userRepository.findOne({ where: { email } });
     if (!user) {
-      throw new UnauthorizedException("Invalid credentials.");
+      throw new BadRequestException(this.i18nService.translate('user.USER_NOT_FOUND'));
     }
 
     // checking password is same or not
     const isValidPwd = await bcrypt.compare(password, user.password);
     if (!isValidPwd) {
-      throw new UnauthorizedException("Invalid credentials.");
+      throw new UnauthorizedException(this.i18nService.translate('user.USER_INVALID_CREDENTIALS'));
     }
 
     const token = this.jwtService.sign({ id: user.id, email: user.email });
@@ -79,7 +81,7 @@ export class AuthService {
     let userExists = await this.userRepository.findOne({where: { refreshToken }});
 
     if(!userExists){
-     throw new UnauthorizedException('Invalid refresh token');
+     throw new BadRequestException(this.i18nService.translate('user.USER_INVALID_REFRESH_TOKEN'));
     }
 
     const tokens = await this.generateTokens(userExists.id, userExists.email);

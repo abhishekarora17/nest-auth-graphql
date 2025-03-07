@@ -1,0 +1,15 @@
+{
+    "USER_NOT_FOUND": "No user found",
+    "USER_ALREADY_EXISTS": "User already exists",
+    "USER_CREATED": "User created",
+    "USER_UPDATED": "User updated",
+    "USER_DELETED": "User deleted",
+    "USER_INVALID_CREDENTIALS": "Invalid user",
+    "USER_NOT_AUTHORIZED": "User not authorized",
+    "USER_NOT_AUTHENTICATED": "User not authenticated",
+    "USER_NOT_VERIFIED": "User not verified",
+    "USER_VERIFIED": "User verified",
+    "USER_LOGGED_IN": "User logged in",
+    "USER_LOGGED_OUT": "User logged out",
+    "USER_INVALID_REFRESH_TOKEN": "Invalid refresh token"
+}
