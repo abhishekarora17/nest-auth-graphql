@@ -11,13 +11,6 @@ export class AuthResolver {
     private readonly authService: AuthService,
   ) {}
 
-  @Mutation(() => Token)
-  async getTokens(
-    @Args('createRefreshToken') createRefreshToken: CreateRefreshTokenDto,
-  ): Promise<Token> {
-    return this.authService.getTokens(createRefreshToken);
-  }
-
   @Mutation(() => UserEntity)
   async createUser(
     @Args('createUser') createUserData: CreateUserDto,
@@ -32,5 +25,10 @@ export class AuthResolver {
       return this.authService.login(loginDto);
   }
 
-
+  @Mutation(() => Token)
+  async getTokens(
+    @Args('createRefreshToken') createRefreshToken: CreateRefreshTokenDto,
+  ): Promise<Token> {
+    return this.authService.getTokens(createRefreshToken);
+  }
 }
