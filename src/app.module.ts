@@ -1,19 +1,16 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { ConfigAppModule } from './config/config.module';
-import { I18nConfigModule } from './config/i18n.module';
-import { TypeOrmConfigModule } from './config/typeOrm.module';
-import { GraphqlConfigModule } from './config/graphql.module';
+import { Config, TypeOrm , Graphql, I18n} from './config';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module'; 
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
-    ConfigAppModule,
-    TypeOrmConfigModule,
-    GraphqlConfigModule,
-    I18nConfigModule,
+    Config,
+    TypeOrm,
+    Graphql,
+    I18n,
     UserModule,
     AuthModule
   ],
