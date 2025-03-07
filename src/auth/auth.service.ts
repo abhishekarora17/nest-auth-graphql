@@ -10,6 +10,7 @@ import { LoginDto } from './dto/login.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { I18nService } from 'nestjs-i18n';
+import { TokenResponse } from './response/token.response';
 
 @Injectable()
 export class AuthService {
@@ -88,10 +89,7 @@ export class AuthService {
     //update tokens in table after creating
     await this.updateRefreshToken(userExists.id, tokens);
 
-    return {
-      accessToken: tokens.accessToken,
-      refreshToken: tokens.refreshToken
-    };
+    return TokenResponse.decode(tokens);
   }
 
   async generateTokens(userId: number, email: string) {
