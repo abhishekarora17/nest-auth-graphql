@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, DeleteDateColumn } from 'typeorm';
+import { Roles } from '../../roles/database/roles.entity';
+import { Entity, Column, PrimaryGeneratedColumn, DeleteDateColumn, JoinColumn, ManyToOne } from 'typeorm';
 
 @Entity()
 export class User {
@@ -27,6 +28,10 @@ export class User {
     default: null,
   })
   mobileNo: number;
+
+  @ManyToOne(() => Roles, (role) => role.users, { eager: true }) 
+  @JoinColumn({ name: "role_id" })
+  role: Roles;
 
   @Column({
      nullable: true,
