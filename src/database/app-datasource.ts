@@ -1,7 +1,8 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
 import * as dotenv from "dotenv";
-import { User } from "src/user/database/user.entity";
+import { Roles } from "../roles/database/roles.entity";
+import { User } from "../user/database/user.entity";
 
 dotenv.config(); // This will load environment variables
 
@@ -15,5 +16,5 @@ export const AppDataSource = new DataSource({
     database: process.env.DB_DATABASE,
     synchronize: false,
     logging: false,
-    entities: [User], 
+    entities: [User, Roles]
 });
