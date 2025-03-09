@@ -6,6 +6,7 @@ import { PassportModule } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { AuthResolver } from './auth.resolver';
 import { UserModule } from 'src/user/user.module';
+import { RolesModule } from 'src/roles/roles.module';
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { UserModule } from 'src/user/user.module';
             signOptions: { expiresIn: "1h" },
         }),
     }),
-    UserModule
+    UserModule,
+    RolesModule
   ],
   providers: [AuthResolver, AuthService, JwtStrategy],
   exports: [AuthService, JwtStrategy, JwtModule],

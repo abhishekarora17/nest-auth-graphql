@@ -8,9 +8,9 @@ export default class createRoleSeeder implements Seeder {
     const roleRepository = dataSource.getRepository(Roles);
 
     const roles = [
-      { name: RolesEnum.ADMIN, createdAt:new Date(Date.now()) },
-      { name: RolesEnum.MANAGER, createdAt:new Date(Date.now()) },
-      { name: RolesEnum.User, createdAt:new Date(Date.now()) },
+      { name: 'Admin', createdAt:new Date(Date.now()) },
+      { name: 'Manager', createdAt:new Date(Date.now()) },
+      { name: 'User', createdAt:new Date(Date.now()) },
     ];
 
     for (const role of roles) {

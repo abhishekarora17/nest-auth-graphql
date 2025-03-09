@@ -1,17 +1,25 @@
-import { Field, InputType, Int } from '@nestjs/graphql';
+    import { Field, InputType, Int, registerEnumType } from '@nestjs/graphql';
+    import { RolesEnum } from 'src/roles/enum/roles.enum';
 
-@InputType()
-export class CreateUserDto {
-    @Field()
-    name: string;
+    registerEnumType(RolesEnum, {
+        name: 'Role',
+    });
 
-    @Field()
-    email: string;
+    @InputType()
+    export class CreateUserDto {
+        @Field()
+        name: string;
 
-    @Field()
-    password: string;
+        @Field()
+        email: string;
 
-    @Field((type) => Int , {nullable: true})
-    mobileNo: number;
-}
+        @Field()
+        password: string;
+
+        @Field((type) => Int , {nullable: true})
+        mobileNo: number;
+
+        @Field((type) => RolesEnum , {defaultValue: RolesEnum.User})
+        roleId: RolesEnum;
+    }
 

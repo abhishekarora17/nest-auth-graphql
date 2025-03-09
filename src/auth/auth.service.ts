@@ -5,27 +5,36 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/database/user.entity';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
-import { UserEntity } from 'src/user/entities/user-entity.entity';
 import { LoginDto } from './dto/login.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { I18nService } from 'nestjs-i18n';
 import { TokenResponse } from './response/token.response';
+import { Roles } from 'src/roles/database/roles.entity';
+import { UserRegister } from 'src/user/entities/user-register.entity';
+// import { UserRegisterResponse } from './response/user-register.response';
 
 @Injectable()
 export class AuthService {
  constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Roles)
+    private readonly roleRepository: Repository<Roles>,
     private readonly jwtService: JwtService,
     private readonly i18nService: I18nService,
   ) {}
 
-  async createUser(createUserDto: CreateUserDto): Promise<UserEntity> {
-    const { name, email, password, mobileNo } = createUserDto;
+  async createUser(createUserDto: CreateUserDto): Promise<UserRegister> {
+    const { name, email, password, mobileNo, roleId } = createUserDto;
 
     let userExists = await this.userRepository.findOne({where: { email }});
     if(userExists){
+      throw new BadRequestException(this.i18nService.translate('user.USER_ALREADY_EXISTS'));
+    }
+
+    const roleEntity = await this.roleRepository.findOne({ where: { id: roleId } });
+    if (!roleEntity) {
       throw new BadRequestException(this.i18nService.translate('user.USER_ALREADY_EXISTS'));
     }
   
@@ -34,31 +43,42 @@ export class AuthService {
         name,
         email,
         password: hashedPassword,
-        mobileNo
+        mobileNo,
+        role:roleEntity
     });
 
     // Save user after creating
     await this.userRepository.save(user);
 
     const tokens = await this.generateTokens(user.id, user.email);
-    //update tokens in table after creating
+    // update tokens in table after creating
     await this.updateRefreshToken(user.id, tokens);
 
-    return {
+    let newUser = await this.userRepository.findOne({
+      where: { id: user.id },
+      relations: ["role"],
+    });
+
+    if (!newUser) {
+        throw new BadRequestException(this.i18nService.translate('user.USER_NOT_FOUND'));
+    }
+
+    return Object.assign(new UserRegister(), newUser, {
       message: this.i18nService.translate('user.USER_CREATED'),
-      success: true,
-      data: Object.assign(new UserEntity(), user, { 
-                accessToken: tokens.accessToken, 
-                refreshToken: tokens.refreshToken 
-            })
-    };
+      accessToken: tokens.accessToken, 
+      refreshToken: tokens.refreshToken 
+    });
   }
 
-  async login(loginDto: LoginDto): Promise<UserEntity> {
+  async login(loginDto: LoginDto): Promise<UserRegister> {
     const { email, password } = loginDto;
 
     // user credentials exists or not
-    const user = await this.userRepository.findOne({ where: { email } });
+    const user = await this.userRepository.findOne({ 
+      where: { email }, 
+      relations : { role : true}
+    });
+
     if (!user) {
       throw new BadRequestException(this.i18nService.translate('user.USER_NOT_FOUND'));
     }
@@ -69,12 +89,15 @@ export class AuthService {
       throw new UnauthorizedException(this.i18nService.translate('user.USER_INVALID_CREDENTIALS'));
     }
 
-    const token = this.jwtService.sign({ id: user.id, email: user.email });
-    return {
-      success: true,
-      message: "Login successful",
-      data: Object.assign(new User(), user, { accessToken: token }),
-    };
+    const tokens = await this.generateTokens(user.id, user.email);
+    // update tokens in table after creating
+    await this.updateRefreshToken(user.id, tokens);
+
+    return Object.assign(new UserRegister(), user, {
+      message: this.i18nService.translate('user.USER_CREATED'),
+      accessToken: tokens.accessToken, 
+      refreshToken: tokens.refreshToken 
+    });
   }
 
   async getTokens(createRefreshTokenDto: CreateRefreshTokenDto): Promise<Token> {

@@ -5,23 +5,24 @@ import { Token } from './entities/token.entity';
 import { UserEntity } from 'src/user/entities/user-entity.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
+import { UserRegister } from 'src/user/entities/user-register.entity';
 @Resolver()
 export class AuthResolver {
   constructor(
     private readonly authService: AuthService,
   ) {}
 
-  @Mutation(() => UserEntity)
+  @Mutation(() => UserRegister)
   async createUser(
     @Args('createUser') createUserData: CreateUserDto,
-  ): Promise<UserEntity> {
+  ): Promise<UserRegister> {
     return this.authService.createUser(createUserData);
   }
 
-  @Mutation(() => UserEntity)
+  @Mutation(() => UserRegister)
   async login(
     @Args("login") loginDto: LoginDto
-  ): Promise<UserEntity> {
+  ): Promise<UserRegister> {
       return this.authService.login(loginDto);
   }
 
