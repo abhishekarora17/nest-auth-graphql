@@ -1,7 +1,7 @@
     import { Field, InputType, Int, registerEnumType } from '@nestjs/graphql';
-    import { RolesEnum } from 'src/roles/enum/roles.enum';
+    import { RoleDto } from 'src/roles/enum/roles-dto.enum';
 
-    registerEnumType(RolesEnum, {
+    registerEnumType(RoleDto, {
         name: 'Role',
     });
 
@@ -19,7 +19,7 @@
         @Field((type) => Int , {nullable: true})
         mobileNo: number;
 
-        @Field((type) => RolesEnum , {defaultValue: RolesEnum.User})
-        roleId: RolesEnum;
+        @Field((type) => RoleDto , {defaultValue: RoleDto.User})
+        role: RoleDto;
     }
 

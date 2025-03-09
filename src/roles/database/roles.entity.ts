@@ -1,5 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, DeleteDateColumn, OneToMany } from 'typeorm';
-import { RolesEnum } from '../enum/roles.enum';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { User } from '../../user/database/user.entity';
 
 @Entity()
@@ -10,7 +9,6 @@ export class Roles {
   @Column({
     type: 'varchar',
     length: 100,
-    default: RolesEnum.User
   })
   name: string;
 

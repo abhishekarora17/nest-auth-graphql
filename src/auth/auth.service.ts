@@ -26,14 +26,14 @@ export class AuthService {
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<UserRegister> {
-    const { name, email, password, mobileNo, roleId } = createUserDto;
+    const { name, email, password, mobileNo, role } = createUserDto;
 
     let userExists = await this.userRepository.findOne({where: { email }});
     if(userExists){
       throw new BadRequestException(this.i18nService.translate('user.USER_ALREADY_EXISTS'));
     }
 
-    const roleEntity = await this.roleRepository.findOne({ where: { id: roleId } });
+    const roleEntity = await this.roleRepository.findOne({ where: { id: role } });
     if (!roleEntity) {
       throw new BadRequestException(this.i18nService.translate('user.USER_ALREADY_EXISTS'));
     }
@@ -50,7 +50,7 @@ export class AuthService {
     // Save user after creating
     await this.userRepository.save(user);
 
-    const tokens = await this.generateTokens(user.id, user.email);
+    const tokens = await this.generateTokens(user.id, user.email, roleEntity.name);
     // update tokens in table after creating
     await this.updateRefreshToken(user.id, tokens);
 
@@ -89,12 +89,12 @@ export class AuthService {
       throw new UnauthorizedException(this.i18nService.translate('user.USER_INVALID_CREDENTIALS'));
     }
 
-    const tokens = await this.generateTokens(user.id, user.email);
+    const tokens = await this.generateTokens(user.id, user.email, user.role.name);
     // update tokens in table after creating
     await this.updateRefreshToken(user.id, tokens);
 
     return Object.assign(new UserRegister(), user, {
-      message: this.i18nService.translate('user.USER_CREATED'),
+      message: this.i18nService.translate('user.USER_LOGGED_IN'),
       accessToken: tokens.accessToken, 
       refreshToken: tokens.refreshToken 
     });
@@ -102,22 +102,25 @@ export class AuthService {
 
   async getTokens(createRefreshTokenDto: CreateRefreshTokenDto): Promise<Token> {
     const { refreshToken  } = createRefreshTokenDto;
-    let userExists = await this.userRepository.findOne({where: { refreshToken }});
+    let userExists = await this.userRepository.findOne({
+      where: { refreshToken },
+      relations: {role: true}
+    });
 
     if(!userExists){
-     throw new BadRequestException(this.i18nService.translate('user.USER_INVALID_REFRESH_TOKEN'));
+      throw new BadRequestException(this.i18nService.translate('user.USER_INVALID_REFRESH_TOKEN'));
     }
 
-    const tokens = await this.generateTokens(userExists.id, userExists.email);
+    const tokens = await this.generateTokens(userExists.id, userExists.email, userExists.role.name);
     //update tokens in table after creating
     await this.updateRefreshToken(userExists.id, tokens);
 
     return TokenResponse.decode(tokens);
   }
 
-  async generateTokens(userId: number, email: string) {
+  async generateTokens(userId: number, email: string, role: string) {
     const accessToken = this.jwtService.sign(
-      { id: userId, email },
+      { id: userId, email , role},
       { secret: process.env.JWT_SECRET, expiresIn: '15m' }
     );
 
