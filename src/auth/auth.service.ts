@@ -9,10 +9,9 @@ import { LoginDto } from './dto/login.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { I18nService } from 'nestjs-i18n';
-import { TokenResponse } from './response/token.response';
 import { Roles } from 'src/roles/database/roles.entity';
 import { UserRegister } from 'src/user/entities/user-register.entity';
-// import { UserRegisterResponse } from './response/user-register.response';
+import { AuthResponse , TokenResponse} from './response/auth.response';
 
 @Injectable()
 export class AuthService {
@@ -63,11 +62,11 @@ export class AuthService {
         throw new BadRequestException(this.i18nService.translate('user.USER_NOT_FOUND'));
     }
 
-    return Object.assign(new UserRegister(), newUser, {
+    return AuthResponse.decode(Object.assign(new UserRegister(), newUser, {
       message: this.i18nService.translate('user.USER_CREATED'),
       accessToken: tokens.accessToken, 
       refreshToken: tokens.refreshToken 
-    });
+    }));
   }
 
   async login(loginDto: LoginDto): Promise<UserRegister> {
@@ -93,11 +92,11 @@ export class AuthService {
     // update tokens in table after creating
     await this.updateRefreshToken(user.id, tokens);
 
-    return Object.assign(new UserRegister(), user, {
+    return AuthResponse.decode(Object.assign(new UserRegister(), user, {
       message: this.i18nService.translate('user.USER_LOGGED_IN'),
       accessToken: tokens.accessToken, 
       refreshToken: tokens.refreshToken 
-    });
+    }));
   }
 
   async getTokens(createRefreshTokenDto: CreateRefreshTokenDto): Promise<Token> {
