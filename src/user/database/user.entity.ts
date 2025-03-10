@@ -1,5 +1,5 @@
 import { Roles } from '../../roles/database/roles.entity';
-import { Entity, Column, PrimaryGeneratedColumn, DeleteDateColumn, JoinColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, DeleteDateColumn, ManyToOne } from 'typeorm';
 
 @Entity()
 export class User {

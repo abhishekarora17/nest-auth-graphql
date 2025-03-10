@@ -1,16 +1,16 @@
 import { Field, ObjectType } from "@nestjs/graphql";
 
-// @ObjectType()
-// export class RoleEntity {
-//     @Field()
-//     id: number;
+@ObjectType()
+export class Roles {
+    @Field()
+    id: number;
 
-//     @Field()
-//     name: string;
-// }
+    @Field()
+    name: string;
+}
 
 @ObjectType()
-export class User {
+export class UserEntity {
     @Field()
     id: number;
 
@@ -20,27 +20,9 @@ export class User {
     @Field()
     email: string;
 
-    // @Field(() => RoleEntity, {nullable: true})
-    // role: RoleEntity;
+    @Field(() => Roles)
+    role: Roles;
 
     @Field({ nullable: true })
     mobileNo: number;
-
-    @Field({ nullable: true })
-    refreshToken?: string;
-
-    @Field({ nullable: true })
-    accessToken?: string;
-}
-
-@ObjectType()
-export class UserEntity {
-    @Field()
-    success: boolean;
-
-    @Field()
-    message: string;
-    
-    @Field(() => User,{ nullable: true })
-    data: User;
 }
