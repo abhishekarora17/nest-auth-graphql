@@ -1,15 +1,16 @@
 import { Seeder, SeederFactoryManager } from 'typeorm-extension';
 import { DataSource } from 'typeorm';
 import { Roles } from '../../roles/database/roles.entity';
+import { UserRole } from 'src/roles/enum/user-role.enum';
 
-export default class createRoleSeeder implements Seeder {
+export default class CreateRoleSeeder implements Seeder {
   public async run(dataSource: DataSource, factoryManager: SeederFactoryManager): Promise<void> {
     const roleRepository = dataSource.getRepository(Roles);
 
     const roles = [
-      { name: 'Admin', createdAt:new Date(Date.now()) },
-      { name: 'Manager', createdAt:new Date(Date.now()) },
-      { name: 'User', createdAt:new Date(Date.now()) },
+      { name: UserRole.ADMIN, createdAt:new Date(Date.now()) },
+      { name: UserRole.MANAGER, createdAt:new Date(Date.now()) },
+      { name: UserRole.USER, createdAt:new Date(Date.now()) },
     ];
 
     for (const role of roles) {
