@@ -121,7 +121,7 @@ export class AuthService {
   async generateTokens(userId: number, email: string, role: string) {
     const accessToken = this.jwtService.sign(
       { id: userId, email , role},
-      { secret: process.env.JWT_SECRET, expiresIn: '15m' }
+      { secret: process.env.JWT_SECRET, expiresIn: '30m' }
     );
 
     const refreshToken = this.jwtService.sign(

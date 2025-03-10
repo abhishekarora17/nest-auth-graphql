@@ -13,4 +13,11 @@ export class UserResolver {
   async getProfile(@CurrentUser() user) : Promise<UserEntity> {
       return this.userService.getProfile(user);
   }
+
+
+  @Query(() => [UserEntity])
+  @Auth()
+  async getUsers() : Promise<UserEntity[]> {
+      return this.userService.getUsers();
+  }
 }

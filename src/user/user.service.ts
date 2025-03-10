@@ -27,4 +27,16 @@ export class UserService {
 
     return GetProfileResponse.decode(currentUser);
   }
+
+  async getUsers(): Promise<UserEntity[]> {
+    let users = await this.userRepository.find({
+      relations: ["role"],
+    });
+
+    if(!users){
+      throw new UnauthorizedException(this.i18nService.translate('user.USER_NOT_FOUND'));
+    }
+
+    return users.map(user => GetProfileResponse.decode(user));
+  }
 }
