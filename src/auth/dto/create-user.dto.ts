@@ -1,7 +1,7 @@
 import { Field, InputType, Int, registerEnumType } from '@nestjs/graphql';
 import { IsEmail } from 'class-validator';
 import { RoleDto } from 'src/roles/enum/roles-dto.enum';
-import { IsEmailAlreadyExist } from '../validation/email.validation';
+import { IsEmailAlreadyExist } from '../../user/validation/email.validation';
 
 registerEnumType(RoleDto, {
     name: 'Role',

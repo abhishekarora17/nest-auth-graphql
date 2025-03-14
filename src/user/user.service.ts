@@ -39,4 +39,8 @@ export class UserService {
 
     return users.map(user => GetProfileResponse.decode(user));
   }
+
+  async findOneByEmail(email): Promise<User | null> {
+    return this.userRepository.findOne({ where: { email } });
+  }
 }
