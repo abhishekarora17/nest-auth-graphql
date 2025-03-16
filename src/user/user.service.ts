@@ -6,6 +6,7 @@ import { CurrentUser } from 'src/auth/decorator/current-user.decorator';
 import { UserEntity } from './entities/user-entity.entity';
 import { I18nService } from 'nestjs-i18n';
 import { GetProfileResponse } from './response/get-profile.response';
+import { PaginateInput } from './dto/paginate.input';
 
 @Injectable()
 export class UserService {
@@ -28,9 +29,11 @@ export class UserService {
     return GetProfileResponse.decode(currentUser);
   }
 
-  async getUsers(): Promise<UserEntity[]> {
+  async getUsers(paginateInput : PaginateInput): Promise<UserEntity[]> {
     let users = await this.userRepository.find({
       relations: ["role"],
+      take: paginateInput.limit,
+      skip: paginateInput.offset,
     });
 
     if(!users){

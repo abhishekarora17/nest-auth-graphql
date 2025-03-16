@@ -1,4 +1,4 @@
-import { Resolver, Query } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { UserService } from './user.service';
 import { CurrentUser } from 'src/auth/decorator/current-user.decorator';
 import { Auth } from 'src/auth/decorator/auth.decorator';
@@ -9,6 +9,7 @@ import { RolesGuard } from 'src/auth/guards/role.guard';
 
 import { Roles } from 'src/auth/decorator/roles.decorator';
 import { UserRole } from 'src/roles/enum/user-role.enum';
+import { PaginateInput } from './dto/paginate.input';
 
 @Resolver()
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -21,9 +22,9 @@ export class UserResolver {
       return this.userService.getProfile(user);
   }
 
-  @Query(() => [UserEntity])
+  @Mutation(() => [UserEntity])
   @Roles(UserRole.ADMIN)
-  async getUsers() : Promise<UserEntity[]> {
-      return this.userService.getUsers();
+  async getUsers(@Args('Pagination') paginateInput: PaginateInput) : Promise<UserEntity[]> {
+      return this.userService.getUsers(paginateInput);
   }
 }

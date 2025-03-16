@@ -14,7 +14,7 @@ export class CreateUserDto {
 
     @Field()
     @IsEmail()
-    @IsEmailAlreadyExist({message : "This email is already in use."})
+    // @IsEmailAlreadyExist({message : "This email is already in use."})
     email: string;
 
     @Field()
